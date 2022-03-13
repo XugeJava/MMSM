@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--1.读取jdbc.properties-->
+    <context:property-placeholder location="classpath:jdbc.properties" />
+
+
+    <!--2.创建数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+
+    <!--3.创建SqlSessionFactoryBean-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--3.1配置数据源-->
+        <property name="dataSource" ref="dataSource" />
+        <!--3.2配置mybatis核心配置文件-->
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+        <!--3.3配置实体类的映射关系(驼峰映射)-->
+        <property name="typeAliasesPackage" value="com.xuge.pojo" />
+    </bean>
+
+    <!--4.创建mapper接口的文件扫描器-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--扫描mapper包下的所有bean-->
+        <property name="basePackage" value="com.xuge.mapper" />
+    </bean>
+
+</beans>

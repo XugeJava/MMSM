@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--1.设置业务逻辑层的包扫描器,目的是在指定的路径下，使用@Service的类，spring负责创建对象，并添加依赖-->
+    <context:component-scan base-package="com.xuge.service" />
+    <!--2.设置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--2.1注入数据源-->
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!--3.添加事务的切面-->
+    <tx:advice id="advice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!---3.1查询方法只读-->
+            <tx:method name="*select*" read-only="true"/>
+            <tx:method name="*find*" read-only="true"/>
+            <tx:method name="*get*" read-only="true"/>
+            <tx:method name="*search*" read-only="true"/>
+            <!--3.2增加方法支持事务-->
+            <tx:method name="*insert*" propagation="REQUIRED" />
+            <tx:method name="*add*" propagation="REQUIRED" />
+            <tx:method name="*save*" propagation="REQUIRED" />
+            <!--3.3删除方法支持事务-->
+            <tx:method name="*delete*" propagation="REQUIRED" />
+            <tx:method name="*remove*" propagation="REQUIRED" />
+            <tx:method name="*clear" propagation="REQUIRED" />
+            <!--3.4更新方法支持事务-->
+            <tx:method name="*update*" propagation="REQUIRED" />
+            <tx:method name="*modify*" propagation="REQUIRED" />
+            <tx:method name="*change*" propagation="REQUIRED" />
+            <tx:method name="*set*" propagation="REQUIRED" />
+            <tx:method name="**" propagation="SUPPORTS" />
+        </tx:attributes>
+
+    </tx:advice>
+    <!--4.完成切面和切面点的植入-->
+    <aop:config>
+        <!--4.1 所有返回值 service包下 所有类 所有方法-->
+        <aop:pointcut id="myPointCut" expression="execution(* com.xuge.service.*.*(..))"/>
+        <aop:advisor advice-ref="advice" pointcut-ref="myPointCut" />
+     </aop:config>
+
+</beans>
